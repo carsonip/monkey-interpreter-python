@@ -23,7 +23,18 @@ class Lexer:
         char = self.source[self.pos]
         if char == '=':
             self.pos += 1
-            return Token(TokenType.ASSIGN, char)
+            if self.pos < len(self.source) and self.source[self.pos] == '=':
+                self.pos += 1
+                return Token(TokenType.EQ, '==')
+            else:
+                return Token(TokenType.ASSIGN, char)
+        elif char == '!':
+            self.pos += 1
+            if self.pos < len(self.source) and self.source[self.pos] == '=':
+                self.pos += 1
+                return Token(TokenType.NOT_EQ, '!=')
+            else:
+                return Token(TokenType.BANG, char)
         elif (token_type := TokenType.get(char)) is not None:
             self.pos += 1
             return Token(token_type, char)

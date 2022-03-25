@@ -41,6 +41,9 @@ if (5 < 10) {
 } else {
   return false;
 }
+
+10 == 10;
+10 != 9;
 """
     expected_tokens = [
         Token(TokenType.LET, 'let'),
@@ -107,6 +110,14 @@ if (5 < 10) {
         Token(TokenType.FALSE, 'false'),
         Token(TokenType.SEMICOLON, ';'),
         Token(TokenType.RBRACE, '}'),
+        Token(TokenType.INT, '10'),
+        Token(TokenType.EQ, '=='),
+        Token(TokenType.INT, '10'),
+        Token(TokenType.SEMICOLON, ';'),
+        Token(TokenType.INT, '10'),
+        Token(TokenType.NOT_EQ, '!='),
+        Token(TokenType.INT, '9'),
+        Token(TokenType.SEMICOLON, ';'),
         Token(TokenType.EOF, ''),
     ]
     lexer = Lexer(input)

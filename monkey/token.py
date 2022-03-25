@@ -24,6 +24,9 @@ class TokenType(AutoName):
     LT = '<'
     GT = '>'
 
+    EQ = '=='
+    NOT_EQ = '!='
+
     COMMA = ','
     SEMICOLON = ';'
 
