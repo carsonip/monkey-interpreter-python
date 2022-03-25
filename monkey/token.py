@@ -34,6 +34,11 @@ class TokenType(AutoName):
 
     FUNCTION = auto()
     LET = auto()
+    TRUE = auto()
+    FALSE = auto()
+    IF = auto()
+    ELSE = auto()
+    RETURN = auto()
 
     @classmethod
     def get(cls, val: str):

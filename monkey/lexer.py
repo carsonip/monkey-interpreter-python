@@ -57,6 +57,11 @@ class Lexer:
 KEYWORDS: Dict[str, TokenType] = {
     'let': TokenType.LET,
     'fn': TokenType.FUNCTION,
+    'true': TokenType.TRUE,
+    'false': TokenType.FALSE,
+    'if': TokenType.IF,
+    'else': TokenType.ELSE,
+    'return': TokenType.RETURN,
 }
 
 
