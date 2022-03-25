@@ -14,8 +14,9 @@ class Lexer:
     def next_token(self) -> Token:
         if self.pos >= len(self.source):
             return Token(TokenType.EOF, '')
-        while self.pos < len(self.source) and self.source[self.pos] in (' ', '\t', '\n'):
-            self.pos += 1
+
+        self._skip_whitespace()
+
         if self.pos >= len(self.source):
             return Token(TokenType.EOF, '')
 
@@ -51,9 +52,13 @@ class Lexer:
 
     def _read_identifier(self):
         pos = self.pos
-        while self.pos < len(self.source) and self.source[self.pos].isalnum():
+        while self.pos < len(self.source) and _is_letter(self.source[self.pos]):
             self.pos += 1
         return self.source[pos:self.pos]
+
+    def _skip_whitespace(self):
+        while self.pos < len(self.source) and self.source[self.pos] in (' ', '\t', '\n'):
+            self.pos += 1
 
 
 KEYWORDS: Dict[str, TokenType] = {
@@ -64,3 +69,7 @@ KEYWORDS: Dict[str, TokenType] = {
 
 def _lookup_ident(ident: str) -> TokenType:
     return KEYWORDS.get(ident, TokenType.IDENT)
+
+
+def _is_letter(char: str) -> bool:
+    return char.isalnum() or char in ('_',)
