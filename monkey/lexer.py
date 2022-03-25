@@ -23,14 +23,14 @@ class Lexer:
         char = self.source[self.pos]
         if char == '=':
             self.pos += 1
-            if self.pos < len(self.source) and self.source[self.pos] == '=':
+            if self.peek_char() == '=':
                 self.pos += 1
                 return Token(TokenType.EQ, '==')
             else:
                 return Token(TokenType.ASSIGN, char)
         elif char == '!':
             self.pos += 1
-            if self.pos < len(self.source) and self.source[self.pos] == '=':
+            if self.peek_char() == '=':
                 self.pos += 1
                 return Token(TokenType.NOT_EQ, '!=')
             else:
@@ -50,19 +50,22 @@ class Lexer:
 
     def _read_identifier(self) -> str:
         pos = self.pos
-        while self.pos < len(self.source) and _is_letter(self.source[self.pos]):
+        while _is_letter(self.peek_char()):
             self.pos += 1
         return self.source[pos:self.pos]
 
     def _read_number(self) -> str:
         pos = self.pos
-        while self.pos < len(self.source) and self.source[self.pos].isnumeric():
+        while self.peek_char().isnumeric():
             self.pos += 1
         return self.source[pos:self.pos]
 
     def _skip_whitespace(self) -> None:
-        while self.pos < len(self.source) and self.source[self.pos] in (' ', '\t', '\n'):
+        while self.peek_char() in (' ', '\t', '\n'):
             self.pos += 1
+
+    def peek_char(self) -> str:
+        return self.source[self.pos] if self.pos < len(self.source) else ''
 
 
 KEYWORDS: Dict[str, TokenType] = {
