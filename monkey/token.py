@@ -16,6 +16,13 @@ class TokenType(AutoName):
 
     ASSIGN = '='
     PLUS = '+'
+    MINUS = '-'
+    SLASH = '/'
+    BANG = '!'
+    ASTERISK = '*'
+
+    LT = '<'
+    GT = '>'
 
     COMMA = ','
     SEMICOLON = ';'
@@ -27,6 +34,10 @@ class TokenType(AutoName):
 
     FUNCTION = auto()
     LET = auto()
+
+    @classmethod
+    def get(cls, val: str):
+        return cls._value2member_map_.get(val, None)
 
 
 @dataclasses.dataclass

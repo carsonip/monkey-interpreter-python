@@ -24,34 +24,18 @@ class Lexer:
         if char == '=':
             self.pos += 1
             return Token(TokenType.ASSIGN, char)
-        elif char == '+':
+        elif (token_type := TokenType.get(char)) is not None:
             self.pos += 1
-            return Token(TokenType.PLUS, char)
-        elif char == ',':
-            self.pos += 1
-            return Token(TokenType.COMMA, char)
-        elif char == ';':
-            self.pos += 1
-            return Token(TokenType.SEMICOLON, char)
-        elif char == '(':
-            self.pos += 1
-            return Token(TokenType.LPAREN, char)
-        elif char == ')':
-            self.pos += 1
-            return Token(TokenType.RPAREN, char)
-        elif char == '{':
-            self.pos += 1
-            return Token(TokenType.LBRACE, char)
-        elif char == '}':
-            self.pos += 1
-            return Token(TokenType.RBRACE, char)
+            return Token(token_type, char)
         elif char.isalpha():
             literal = self._read_identifier()
             return Token(_lookup_ident(literal), literal)
         elif char.isnumeric():
             literal = self._read_number()
             return Token(TokenType.INT, literal)
-        return Token(TokenType.ILLEGAL, '')
+        else:
+            self.pos += 1
+            return Token(TokenType.ILLEGAL, char)
 
     def _read_identifier(self):
         pos = self.pos
