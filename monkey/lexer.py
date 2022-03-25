@@ -48,19 +48,19 @@ class Lexer:
             self.pos += 1
             return Token(TokenType.ILLEGAL, char)
 
-    def _read_identifier(self):
+    def _read_identifier(self) -> str:
         pos = self.pos
         while self.pos < len(self.source) and _is_letter(self.source[self.pos]):
             self.pos += 1
         return self.source[pos:self.pos]
 
-    def _read_number(self):
+    def _read_number(self) -> str:
         pos = self.pos
         while self.pos < len(self.source) and self.source[self.pos].isnumeric():
             self.pos += 1
         return self.source[pos:self.pos]
 
-    def _skip_whitespace(self):
+    def _skip_whitespace(self) -> None:
         while self.pos < len(self.source) and self.source[self.pos] in (' ', '\t', '\n'):
             self.pos += 1
 

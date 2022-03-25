@@ -1,9 +1,11 @@
 import dataclasses
 from enum import Enum, auto
+from typing import Optional, Any, List
 
 
 class AutoName(Enum):
-    def _generate_next_value_(name, start, count, last_values):
+    @staticmethod
+    def _generate_next_value_(name: str, start: int, count: int, last_values: List[Any]) -> Any:
         return name
 
 
@@ -44,8 +46,8 @@ class TokenType(AutoName):
     RETURN = auto()
 
     @classmethod
-    def get(cls, val: str):
-        return cls._value2member_map_.get(val, None)
+    def get(cls, val: str) -> Optional['TokenType']:
+        return cls._value2member_map_.get(val, None)  # type: ignore
 
 
 @dataclasses.dataclass
