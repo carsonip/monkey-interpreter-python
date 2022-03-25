@@ -45,14 +45,23 @@ class Lexer:
         elif char == '}':
             self.pos += 1
             return Token(TokenType.RBRACE, char)
-        elif char.isalnum():
+        elif char.isalpha():
             literal = self._read_identifier()
             return Token(_lookup_ident(literal), literal)
+        elif char.isnumeric():
+            literal = self._read_number()
+            return Token(TokenType.INT, literal)
         return Token(TokenType.ILLEGAL, '')
 
     def _read_identifier(self):
         pos = self.pos
         while self.pos < len(self.source) and _is_letter(self.source[self.pos]):
+            self.pos += 1
+        return self.source[pos:self.pos]
+
+    def _read_number(self):
+        pos = self.pos
+        while self.pos < len(self.source) and self.source[self.pos].isnumeric():
             self.pos += 1
         return self.source[pos:self.pos]
 
