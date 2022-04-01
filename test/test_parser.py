@@ -58,8 +58,8 @@ def test_let_statements(input, name, value):
 
     statement = program.statements[0]
     assert isinstance(statement, LetStatement)
-    # assert statement.name.token_literal() == name
-    # assert statement.value.token_literal() == value
+    assert statement.name.token_literal() == name
+    assert statement.value.token_literal() == value
 
 
 @pytest.mark.parametrize('input,value', [
@@ -77,7 +77,7 @@ def test_return_statements(input, value):
 
     statement = program.statements[0]
     assert isinstance(statement, ReturnStatement)
-    # assert statement.return_value.token_literal() == value
+    assert statement.return_value.token_literal() == value
 
 
 def test_string():

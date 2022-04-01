@@ -101,22 +101,23 @@ class Parser:
                 return self.parse_expression_statement()
 
     def parse_let_statement(self) -> ast.LetStatement:
-        statement = ast.LetStatement(token=self.current_token, name=None, value=None)
+        tok = self.current_token
         self.expect_peek_and_next(token.TokenType.IDENT)
-        # TODO: parse expr
+        ident = self.parse_identifier()
         self.expect_peek_and_next(token.TokenType.ASSIGN)
-        # TODO: parse expr
+        self.next_token()
+        expression = self.parse_expression(Precedence.LOWEST)
         while self.current_token.type_ != token.TokenType.SEMICOLON:
             self.next_token()
-        return statement
+        return ast.LetStatement(token=tok, name=ident, value=expression)
 
     def parse_return_statement(self) -> ast.ReturnStatement:
-        statement = ast.ReturnStatement(token=self.current_token, return_value=None)
+        tok = self.current_token
         self.next_token()
-        # TODO: parse expr
+        expression = self.parse_expression(Precedence.LOWEST)
         while self.current_token.type_ != token.TokenType.SEMICOLON:
             self.next_token()
-        return statement
+        return ast.ReturnStatement(token=tok, return_value=expression)
 
     def parse_expression_statement(self) -> ast.ExpressionStatement:
         statement = ast.ExpressionStatement(
