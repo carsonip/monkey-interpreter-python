@@ -25,45 +25,51 @@ class Precedence(IntEnum):
     PREFIX = auto()
     CALL = auto()
 
-
-PRECEDENCES: dict[token.TokenType, Precedence] = {
-    token.TokenType.EQ: Precedence.EQUALS,
-    token.TokenType.NOT_EQ: Precedence.EQUALS,
-    token.TokenType.LT: Precedence.LESSGREATER,
-    token.TokenType.GT: Precedence.LESSGREATER,
-    token.TokenType.PLUS: Precedence.SUM,
-    token.TokenType.MINUS: Precedence.SUM,
-    token.TokenType.SLASH: Precedence.PRODUCT,
-    token.TokenType.ASTERISK: Precedence.PRODUCT,
-}
+    @classmethod
+    def get(cls, token_type: token.TokenType, default: 'Precedence') -> 'Precedence':
+        return {
+            token.TokenType.EQ: cls.EQUALS,
+            token.TokenType.NOT_EQ: cls.EQUALS,
+            token.TokenType.LT: cls.LESSGREATER,
+            token.TokenType.GT: cls.LESSGREATER,
+            token.TokenType.PLUS: cls.SUM,
+            token.TokenType.MINUS: cls.SUM,
+            token.TokenType.SLASH: cls.PRODUCT,
+            token.TokenType.ASTERISK: cls.PRODUCT,
+        }.get(token_type, default)
 
 
 class Parser:
 
     def __init__(self, lexer_: lexer.Lexer) -> None:
-        self.prefix_parse_funcs: dict[token.TokenType, PrefixParseFuncType] = {
-            token.TokenType.IDENT: type(self).parse_identifier,
-            token.TokenType.INT: type(self).parse_integer_literal,
-            token.TokenType.BANG: type(self).parse_prefix_expression,
-            token.TokenType.MINUS: type(self).parse_prefix_expression,
-        }
-        self.infix_parse_funcs: dict[token.TokenType, InfixParseFuncType] = {
-            token.TokenType.PLUS: type(self).parse_infix_expression,
-            token.TokenType.MINUS: type(self).parse_infix_expression,
-            token.TokenType.SLASH: type(self).parse_infix_expression,
-            token.TokenType.ASTERISK: type(self).parse_infix_expression,
-            token.TokenType.EQ: type(self).parse_infix_expression,
-            token.TokenType.NOT_EQ: type(self).parse_infix_expression,
-            token.TokenType.LT: type(self).parse_infix_expression,
-            token.TokenType.GT: type(self).parse_infix_expression,
-        }
-
         self.lexer = lexer_
         self.errors: list[str] = []
         self.current_token: token.Token | None = None
         self.peek_token: token.Token | None = None
         self.next_token()
         self.next_token()
+
+    def get_prefix_parse_func(self, token_type: token.TokenType) -> PrefixParseFuncType:
+        parse_funcs: dict[token.TokenType, PrefixParseFuncType] = {
+            token.TokenType.IDENT: self.parse_identifier,
+            token.TokenType.INT: self.parse_integer_literal,
+            token.TokenType.BANG: self.parse_prefix_expression,
+            token.TokenType.MINUS: self.parse_prefix_expression,
+        }
+        return parse_funcs.get(token_type)
+
+    def get_infix_parse_func(self, token_type: token.TokenType) -> InfixParseFuncType:
+        parse_funcs: dict[token.TokenType, InfixParseFuncType] = {
+            token.TokenType.PLUS: self.parse_infix_expression,
+            token.TokenType.MINUS: self.parse_infix_expression,
+            token.TokenType.SLASH: self.parse_infix_expression,
+            token.TokenType.ASTERISK: self.parse_infix_expression,
+            token.TokenType.EQ: self.parse_infix_expression,
+            token.TokenType.NOT_EQ: self.parse_infix_expression,
+            token.TokenType.LT: self.parse_infix_expression,
+            token.TokenType.GT: self.parse_infix_expression,
+        }
+        return parse_funcs.get(token_type)
 
     def next_token(self) -> None:
         self.current_token = self.peek_token
@@ -129,19 +135,19 @@ class Parser:
         return statement
 
     def parse_expression(self, precedence: Precedence) -> ast.Expression:
-        prefix_parse_func = self.prefix_parse_funcs.get(self.current_token.type_)
+        prefix_parse_func = self.get_prefix_parse_func(self.current_token.type_)
         if prefix_parse_func is None:
             self.errors.append(f'No prefix parse function for {self.current_token.type_.name} found')
             raise NoPrefixParseFuncError
-        left_expression = types.MethodType(prefix_parse_func, self)()
+        left_expression = prefix_parse_func()
 
         while self.peek_token.type_ != token.TokenType.SEMICOLON and precedence < self.peek_precedence():
-            infix_parse_func = self.infix_parse_funcs.get(self.peek_token.type_)
+            infix_parse_func = self.get_infix_parse_func(self.peek_token.type_)
             if infix_parse_func is None:
                 return left_expression
 
             self.next_token()
-            left_expression = types.MethodType(infix_parse_func, self)(left_expression)
+            left_expression = infix_parse_func(left_expression)
 
         return left_expression
 
@@ -169,7 +175,7 @@ class Parser:
                                    right=right)
 
     def current_precedence(self) -> Precedence:
-        return PRECEDENCES.get(self.current_token.type_, Precedence.LOWEST)
+        return Precedence.get(self.current_token.type_, Precedence.LOWEST)
 
     def peek_precedence(self) -> Precedence:
-        return PRECEDENCES.get(self.peek_token.type_, Precedence.LOWEST)
+        return Precedence.get(self.peek_token.type_, Precedence.LOWEST)
