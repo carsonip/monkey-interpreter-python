@@ -13,7 +13,9 @@ class Node(abc.ABC):
     def string(self) -> str:
         pass
 
-    def __eq__(self, other: 'Node') -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Node):
+            return NotImplemented
         return self.__dict__ == other.__dict__
 
 

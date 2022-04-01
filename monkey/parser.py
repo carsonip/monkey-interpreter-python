@@ -1,4 +1,3 @@
-import types
 from enum import IntEnum, auto
 from typing import Callable
 
@@ -44,12 +43,10 @@ class Parser:
     def __init__(self, lexer_: lexer.Lexer) -> None:
         self.lexer = lexer_
         self.errors: list[str] = []
-        self.current_token: token.Token | None = None
-        self.peek_token: token.Token | None = None
-        self.next_token()
-        self.next_token()
+        self.current_token: token.Token = self.lexer.next_token()
+        self.peek_token: token.Token = self.lexer.next_token()
 
-    def get_prefix_parse_func(self, token_type: token.TokenType) -> PrefixParseFuncType:
+    def get_prefix_parse_func(self, token_type: token.TokenType) -> PrefixParseFuncType | None:
         parse_funcs: dict[token.TokenType, PrefixParseFuncType] = {
             token.TokenType.IDENT: self.parse_identifier,
             token.TokenType.INT: self.parse_integer_literal,
@@ -58,7 +55,7 @@ class Parser:
         }
         return parse_funcs.get(token_type)
 
-    def get_infix_parse_func(self, token_type: token.TokenType) -> InfixParseFuncType:
+    def get_infix_parse_func(self, token_type: token.TokenType) -> InfixParseFuncType | None:
         parse_funcs: dict[token.TokenType, InfixParseFuncType] = {
             token.TokenType.PLUS: self.parse_infix_expression,
             token.TokenType.MINUS: self.parse_infix_expression,
