@@ -17,6 +17,7 @@ from monkey.token import Token, TokenType
     ('letter', Token(TokenType.IDENT, 'letter')),
     ('fn', Token(TokenType.FUNCTION, 'fn')),
     ('fnn', Token(TokenType.IDENT, 'fnn')),
+    ('~', Token(TokenType.ILLEGAL, '~')),
     ('', Token(TokenType.EOF, '')),
 ])
 def test_next_token(input, expected_token):
