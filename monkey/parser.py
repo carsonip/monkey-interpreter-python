@@ -73,7 +73,7 @@ class Parser:
         self.peek_token = self.lexer.next_token()
 
     def expect_peek_and_next(self, token_type: token.TokenType) -> None:
-        if self.peek_token.type_ != token_type:
+        if not self.peek_token.is_type(token_type):
             self.errors.append(f'Expected next token to be {token_type.name}, got {self.peek_token.type_.name} instead')
             raise UnexpectedTokenType
         self.next_token()
@@ -81,7 +81,7 @@ class Parser:
     def parse_program(self) -> ast.Program:
         program = ast.Program()
 
-        while self.current_token.type_ != token.TokenType.EOF:
+        while not self.current_token.is_type(token.TokenType.EOF):
             try:
                 statement = self.parse_statement()
             except UnexpectedTokenType:
@@ -110,7 +110,7 @@ class Parser:
         self.expect_peek_and_next(token.TokenType.ASSIGN)
         self.next_token()
         expression = self.parse_expression(Precedence.LOWEST)
-        while self.current_token.type_ != token.TokenType.SEMICOLON:
+        while not self.current_token.is_type(token.TokenType.SEMICOLON):
             self.next_token()
         return ast.LetStatement(token=tok, name=ident, value=expression)
 
@@ -118,7 +118,7 @@ class Parser:
         tok = self.current_token
         self.next_token()
         expression = self.parse_expression(Precedence.LOWEST)
-        while self.current_token.type_ != token.TokenType.SEMICOLON:
+        while not self.current_token.is_type(token.TokenType.SEMICOLON):
             self.next_token()
         return ast.ReturnStatement(token=tok, return_value=expression)
 
@@ -127,7 +127,7 @@ class Parser:
             token=self.current_token,
             expression=self.parse_expression(Precedence.LOWEST),
         )
-        if self.peek_token.type_ == token.TokenType.SEMICOLON:
+        if self.peek_token.is_type(token.TokenType.SEMICOLON):
             self.next_token()
         return statement
 
@@ -138,7 +138,7 @@ class Parser:
             raise NoPrefixParseFuncError
         left_expression = prefix_parse_func()
 
-        while self.peek_token.type_ != token.TokenType.SEMICOLON and precedence < self.peek_precedence():
+        while not self.peek_token.is_type(token.TokenType.SEMICOLON) and precedence < self.peek_precedence():
             infix_parse_func = self.get_infix_parse_func(self.peek_token.type_)
             if infix_parse_func is None:
                 return left_expression
