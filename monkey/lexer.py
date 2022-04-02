@@ -13,26 +13,26 @@ class Lexer:
 
     def next_token(self) -> Token:
         if self.pos >= len(self.source):
-            return Token(TokenType.EOF, '')
+            return Token(TokenType.EOF, "")
 
         self._skip_whitespace()
 
         if self.pos >= len(self.source):
-            return Token(TokenType.EOF, '')
+            return Token(TokenType.EOF, "")
 
         char = self.source[self.pos]
-        if char == '=':
+        if char == "=":
             self.pos += 1
-            if self.peek_char() == '=':
+            if self.peek_char() == "=":
                 self.pos += 1
-                return Token(TokenType.EQ, '==')
+                return Token(TokenType.EQ, "==")
             else:
                 return Token(TokenType.ASSIGN, char)
-        elif char == '!':
+        elif char == "!":
             self.pos += 1
-            if self.peek_char() == '=':
+            if self.peek_char() == "=":
                 self.pos += 1
-                return Token(TokenType.NOT_EQ, '!=')
+                return Token(TokenType.NOT_EQ, "!=")
             else:
                 return Token(TokenType.BANG, char)
         elif (token_type := TokenType.get(char)) is not None:
@@ -52,30 +52,30 @@ class Lexer:
         pos = self.pos
         while _is_letter(self.peek_char()):
             self.pos += 1
-        return self.source[pos:self.pos]
+        return self.source[pos : self.pos]
 
     def _read_number(self) -> str:
         pos = self.pos
         while self.peek_char().isnumeric():
             self.pos += 1
-        return self.source[pos:self.pos]
+        return self.source[pos : self.pos]
 
     def _skip_whitespace(self) -> None:
-        while self.peek_char() in (' ', '\t', '\n'):
+        while self.peek_char() in (" ", "\t", "\n"):
             self.pos += 1
 
     def peek_char(self) -> str:
-        return self.source[self.pos] if self.pos < len(self.source) else ''
+        return self.source[self.pos] if self.pos < len(self.source) else ""
 
 
 KEYWORDS: Dict[str, TokenType] = {
-    'let': TokenType.LET,
-    'fn': TokenType.FUNCTION,
-    'true': TokenType.TRUE,
-    'false': TokenType.FALSE,
-    'if': TokenType.IF,
-    'else': TokenType.ELSE,
-    'return': TokenType.RETURN,
+    "let": TokenType.LET,
+    "fn": TokenType.FUNCTION,
+    "true": TokenType.TRUE,
+    "false": TokenType.FALSE,
+    "if": TokenType.IF,
+    "else": TokenType.ELSE,
+    "return": TokenType.RETURN,
 }
 
 
@@ -84,4 +84,4 @@ def _lookup_ident(ident: str) -> TokenType:
 
 
 def _is_letter(char: str) -> bool:
-    return char.isalnum() or char in ('_',)
+    return char.isalnum() or char in ("_",)

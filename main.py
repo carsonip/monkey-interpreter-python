@@ -5,7 +5,7 @@ from monkey.token import TokenType
 
 
 def prompt():
-    print('>> ', end='')
+    print(">> ", end="")
     sys.stdout.flush()
 
 
@@ -18,5 +18,5 @@ def repl():
         prompt()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repl()

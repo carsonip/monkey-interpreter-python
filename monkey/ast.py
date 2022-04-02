@@ -35,7 +35,7 @@ class Program(Node):
         return self.statements[0].token_literal() if self.statements else ""
 
     def string(self) -> str:
-        return '\n'.join(statement.string() for statement in self.statements)
+        return "\n".join(statement.string() for statement in self.statements)
 
 
 @dataclasses.dataclass
@@ -60,7 +60,7 @@ class LetStatement(Statement):
         return self.token.literal
 
     def string(self) -> str:
-        return f'{self.token.literal} {self.name.string()} = {self.value.string()};'
+        return f"{self.token.literal} {self.name.string()} = {self.value.string()};"
 
 
 @dataclasses.dataclass
@@ -72,7 +72,7 @@ class ReturnStatement(Statement):
         return self.token.literal
 
     def string(self) -> str:
-        return f'{self.token.literal} {self.return_value.string()};'
+        return f"{self.token.literal} {self.return_value.string()};"
 
 
 @dataclasses.dataclass
@@ -96,7 +96,7 @@ class IntegerLiteral(Expression):
         return self.token.literal
 
     def string(self) -> str:
-        return f'{self.value}'
+        return f"{self.value}"
 
 
 @dataclasses.dataclass
@@ -109,7 +109,7 @@ class PrefixExpression(Expression):
         return self.token.literal
 
     def string(self) -> str:
-        return f'({self.operator}{self.right.string()})'
+        return f"({self.operator}{self.right.string()})"
 
 
 @dataclasses.dataclass
@@ -123,7 +123,7 @@ class InfixExpression(Expression):
         return self.token.literal
 
     def string(self) -> str:
-        return f'({self.left.string()} {self.operator} {self.right.string()})'
+        return f"({self.left.string()} {self.operator} {self.right.string()})"
 
 
 @dataclasses.dataclass

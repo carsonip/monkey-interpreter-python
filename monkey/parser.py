@@ -25,7 +25,7 @@ class Precedence(IntEnum):
     CALL = auto()
 
     @classmethod
-    def get(cls, token_type: token.TokenType, default: 'Precedence') -> 'Precedence':
+    def get(cls, token_type: token.TokenType, default: "Precedence") -> "Precedence":
         return {
             token.TokenType.EQ: cls.EQUALS,
             token.TokenType.NOT_EQ: cls.EQUALS,
@@ -39,14 +39,15 @@ class Precedence(IntEnum):
 
 
 class Parser:
-
     def __init__(self, lexer_: lexer.Lexer) -> None:
         self.lexer = lexer_
         self.errors: list[str] = []
         self.current_token: token.Token = self.lexer.next_token()
         self.peek_token: token.Token = self.lexer.next_token()
 
-    def get_prefix_parse_func(self, token_type: token.TokenType) -> PrefixParseFuncType | None:
+    def get_prefix_parse_func(
+        self, token_type: token.TokenType
+    ) -> PrefixParseFuncType | None:
         parse_funcs: dict[token.TokenType, PrefixParseFuncType] = {
             token.TokenType.IDENT: self.parse_identifier,
             token.TokenType.INT: self.parse_integer_literal,
@@ -57,7 +58,9 @@ class Parser:
         }
         return parse_funcs.get(token_type)
 
-    def get_infix_parse_func(self, token_type: token.TokenType) -> InfixParseFuncType | None:
+    def get_infix_parse_func(
+        self, token_type: token.TokenType
+    ) -> InfixParseFuncType | None:
         parse_funcs: dict[token.TokenType, InfixParseFuncType] = {
             token.TokenType.PLUS: self.parse_infix_expression,
             token.TokenType.MINUS: self.parse_infix_expression,
@@ -76,7 +79,9 @@ class Parser:
 
     def expect_peek_and_next(self, token_type: token.TokenType) -> None:
         if not self.peek_token.is_type(token_type):
-            self.errors.append(f'Expected next token to be {token_type.name}, got {self.peek_token.type_.name} instead')
+            self.errors.append(
+                f"Expected next token to be {token_type.name}, got {self.peek_token.type_.name} instead"
+            )
             raise UnexpectedTokenType
         self.next_token()
 
@@ -136,11 +141,16 @@ class Parser:
     def parse_expression(self, precedence: Precedence) -> ast.Expression:
         prefix_parse_func = self.get_prefix_parse_func(self.current_token.type_)
         if prefix_parse_func is None:
-            self.errors.append(f'No prefix parse function for {self.current_token.type_.name} found')
+            self.errors.append(
+                f"No prefix parse function for {self.current_token.type_.name} found"
+            )
             raise NoPrefixParseFuncError
         left_expression = prefix_parse_func()
 
-        while not self.peek_token.is_type(token.TokenType.SEMICOLON) and precedence < self.peek_precedence():
+        while (
+            not self.peek_token.is_type(token.TokenType.SEMICOLON)
+            and precedence < self.peek_precedence()
+        ):
             infix_parse_func = self.get_infix_parse_func(self.peek_token.type_)
             if infix_parse_func is None:
                 return left_expression
@@ -151,30 +161,38 @@ class Parser:
         return left_expression
 
     def parse_identifier(self) -> ast.Identifier:
-        return ast.Identifier(token=self.current_token, value=self.current_token.literal)
+        return ast.Identifier(
+            token=self.current_token, value=self.current_token.literal
+        )
 
     def parse_integer_literal(self) -> ast.IntegerLiteral:
-        return ast.IntegerLiteral(token=self.current_token, value=int(self.current_token.literal, 10))
+        return ast.IntegerLiteral(
+            token=self.current_token, value=int(self.current_token.literal, 10)
+        )
 
     def parse_boolean(self) -> ast.Boolean:
-        return ast.Boolean(token=self.current_token, value=self.current_token.type_ == token.TokenType.TRUE)
+        return ast.Boolean(
+            token=self.current_token,
+            value=self.current_token.type_ == token.TokenType.TRUE,
+        )
 
     def parse_prefix_expression(self) -> ast.PrefixExpression:
         tok = self.current_token
         self.next_token()
-        return ast.PrefixExpression(token=tok,
-                                    operator=tok.literal,
-                                    right=self.parse_expression(Precedence.PREFIX))
+        return ast.PrefixExpression(
+            token=tok,
+            operator=tok.literal,
+            right=self.parse_expression(Precedence.PREFIX),
+        )
 
     def parse_infix_expression(self, left: ast.Expression) -> ast.InfixExpression:
         tok = self.current_token
         precedence = self.current_precedence()
         self.next_token()
         right = self.parse_expression(precedence)
-        return ast.InfixExpression(token=tok,
-                                   operator=tok.literal,
-                                   left=left,
-                                   right=right)
+        return ast.InfixExpression(
+            token=tok, operator=tok.literal, left=left, right=right
+        )
 
     def current_precedence(self) -> Precedence:
         return Precedence.get(self.current_token.type_, Precedence.LOWEST)

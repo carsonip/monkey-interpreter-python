@@ -5,7 +5,9 @@ from typing import Optional, Any, List
 
 class AutoName(Enum):
     @staticmethod
-    def _generate_next_value_(name: str, start: int, count: int, last_values: List[Any]) -> Any:
+    def _generate_next_value_(
+        name: str, start: int, count: int, last_values: List[Any]
+    ) -> Any:
         return name
 
 
@@ -16,26 +18,26 @@ class TokenType(AutoName):
     IDENT = auto()
     INT = auto()
 
-    ASSIGN = '='
-    PLUS = '+'
-    MINUS = '-'
-    SLASH = '/'
-    BANG = '!'
-    ASTERISK = '*'
+    ASSIGN = "="
+    PLUS = "+"
+    MINUS = "-"
+    SLASH = "/"
+    BANG = "!"
+    ASTERISK = "*"
 
-    LT = '<'
-    GT = '>'
+    LT = "<"
+    GT = ">"
 
-    EQ = '=='
-    NOT_EQ = '!='
+    EQ = "=="
+    NOT_EQ = "!="
 
-    COMMA = ','
-    SEMICOLON = ';'
+    COMMA = ","
+    SEMICOLON = ";"
 
-    LPAREN = '('
-    RPAREN = ')'
-    LBRACE = '{'
-    RBRACE = '}'
+    LPAREN = "("
+    RPAREN = ")"
+    LBRACE = "{"
+    RBRACE = "}"
 
     FUNCTION = auto()
     LET = auto()
@@ -46,7 +48,7 @@ class TokenType(AutoName):
     RETURN = auto()
 
     @classmethod
-    def get(cls, val: str) -> Optional['TokenType']:
+    def get(cls, val: str) -> Optional["TokenType"]:
         return cls._value2member_map_.get(val, None)  # type: ignore
 
 
