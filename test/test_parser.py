@@ -1,7 +1,7 @@
 import pytest
 
 from monkey.ast import LetStatement, ReturnStatement, Program, Identifier, ExpressionStatement, IntegerLiteral, \
-    PrefixExpression, InfixExpression
+    PrefixExpression, InfixExpression, Boolean
 from monkey.lexer import Lexer
 from monkey.parser import Parser
 from monkey.token import Token, TokenType
@@ -105,18 +105,21 @@ def test_identifier_expression():
     ]
 
 
-def test_integer_literal_expression():
-    input = '5;'
+@pytest.mark.parametrize('input,expression', [
+    ('5;', IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5)),
+    ('true;', Boolean(token=Token(type_=TokenType.TRUE, literal='true'), value=True)),
+    ('false;', Boolean(token=Token(type_=TokenType.FALSE, literal='false'), value=False)),
+])
+def test_literal_expression(input, expression):
     lexer = Lexer(input)
     parser = Parser(lexer)
 
     program = parser.parse_program()
     assert not parser.errors
-    int_token = Token(type_=TokenType.INT, literal='5')
-    assert program.statements == [
-        ExpressionStatement(token=int_token,
-                            expression=IntegerLiteral(token=int_token, value=5))
-    ]
+    assert len(program.statements) == 1
+    statement = program.statements[0]
+    assert isinstance(statement, ExpressionStatement)
+    assert statement.expression == expression
 
 
 @pytest.mark.parametrize('input,expression', [
@@ -140,38 +143,83 @@ def test_parsing_prefix_expressions(input, expression):
 
 
 @pytest.mark.parametrize('input,expression', [
-    ('5 + 5;', InfixExpression(token=Token(type_=TokenType.PLUS, literal='+'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='+',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 - 5;', InfixExpression(token=Token(type_=TokenType.MINUS, literal='-'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='-',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 * 5;', InfixExpression(token=Token(type_=TokenType.ASTERISK, literal='*'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='*',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 / 5;', InfixExpression(token=Token(type_=TokenType.SLASH, literal='/'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='/',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 > 5;', InfixExpression(token=Token(type_=TokenType.GT, literal='>'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='>',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 < 5;', InfixExpression(token=Token(type_=TokenType.LT, literal='<'),
-                               left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                               operator='<',
-                               right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 == 5;', InfixExpression(token=Token(type_=TokenType.EQ, literal='=='),
-                                left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                                operator='==',
-                                right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
-    ('5 != 5;', InfixExpression(token=Token(type_=TokenType.NOT_EQ, literal='!='),
-                                left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
-                                operator='!=',
-                                right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))),
+    (
+            '5 + 5;',
+            InfixExpression(token=Token(type_=TokenType.PLUS, literal='+'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='+',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 - 5;',
+            InfixExpression(token=Token(type_=TokenType.MINUS, literal='-'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='-',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 * 5;',
+            InfixExpression(token=Token(type_=TokenType.ASTERISK, literal='*'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='*',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 / 5;',
+            InfixExpression(token=Token(type_=TokenType.SLASH, literal='/'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='/',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 > 5;',
+            InfixExpression(token=Token(type_=TokenType.GT, literal='>'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='>',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 < 5;',
+            InfixExpression(token=Token(type_=TokenType.LT, literal='<'),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='<',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 == 5;',
+            InfixExpression(token=Token(type_=TokenType.EQ, literal='=='),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='==',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            '5 != 5;',
+            InfixExpression(token=Token(type_=TokenType.NOT_EQ, literal='!='),
+                            left=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5),
+                            operator='!=',
+                            right=IntegerLiteral(token=Token(type_=TokenType.INT, literal='5'), value=5))
+    ),
+    (
+            'true == true;',
+            InfixExpression(token=Token(type_=TokenType.EQ, literal='=='),
+                            left=Boolean(token=Token(type_=TokenType.TRUE, literal='true'), value=True),
+                            operator='==',
+                            right=Boolean(token=Token(type_=TokenType.TRUE, literal='true'), value=True))
+    ),
+    (
+            'true != false;',
+            InfixExpression(token=Token(type_=TokenType.NOT_EQ, literal='!='),
+                            left=Boolean(token=Token(type_=TokenType.TRUE, literal='true'), value=True),
+                            operator='!=',
+                            right=Boolean(token=Token(type_=TokenType.FALSE, literal='false'), value=False))
+    ),
+    (
+            'false == false;',
+            InfixExpression(token=Token(type_=TokenType.EQ, literal='=='),
+                            left=Boolean(token=Token(type_=TokenType.FALSE, literal='false'), value=False),
+                            operator='==',
+                            right=Boolean(token=Token(type_=TokenType.FALSE, literal='false'), value=False))
+    ),
 ])
 def test_parsing_infix_expressions(input, expression):
     lexer = Lexer(input)
@@ -179,8 +227,23 @@ def test_parsing_infix_expressions(input, expression):
 
     program = parser.parse_program()
     assert not parser.errors
-    assert isinstance(expression.left, IntegerLiteral)
-    assert program.statements == [
-        ExpressionStatement(token=expression.left.token,
-                            expression=expression)
-    ]
+    assert len(program.statements) == 1
+    statement = program.statements[0]
+    assert isinstance(statement, ExpressionStatement)
+    assert statement.expression == expression
+
+
+@pytest.mark.parametrize('input,expected', [
+    ('true', 'true'),
+    ('false', 'false'),
+    ('3 > 5 == false', '((3 > 5) == false)'),
+    ('3 < 5 == true', '((3 < 5) == true)'),
+])
+def test_operator_precedence_parsing(input, expected):
+    lexer = Lexer(input)
+    parser = Parser(lexer)
+
+    program = parser.parse_program()
+    assert not parser.errors
+    assert len(program.statements) == 1
+    assert program.statements[0].string() == expected

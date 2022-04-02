@@ -52,6 +52,8 @@ class Parser:
             token.TokenType.INT: self.parse_integer_literal,
             token.TokenType.BANG: self.parse_prefix_expression,
             token.TokenType.MINUS: self.parse_prefix_expression,
+            token.TokenType.TRUE: self.parse_boolean,
+            token.TokenType.FALSE: self.parse_boolean,
         }
         return parse_funcs.get(token_type)
 
@@ -153,6 +155,9 @@ class Parser:
 
     def parse_integer_literal(self) -> ast.IntegerLiteral:
         return ast.IntegerLiteral(token=self.current_token, value=int(self.current_token.literal, 10))
+
+    def parse_boolean(self) -> ast.Boolean:
+        return ast.Boolean(token=self.current_token, value=self.current_token.type_ == token.TokenType.TRUE)
 
     def parse_prefix_expression(self) -> ast.PrefixExpression:
         tok = self.current_token
