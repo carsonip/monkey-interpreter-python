@@ -55,6 +55,7 @@ class Parser:
             token.TokenType.MINUS: self.parse_prefix_expression,
             token.TokenType.TRUE: self.parse_boolean,
             token.TokenType.FALSE: self.parse_boolean,
+            token.TokenType.LPAREN: self.parse_grouped_expression,
         }
         return parse_funcs.get(token_type)
 
@@ -91,9 +92,7 @@ class Parser:
         while not self.current_token.is_type(token.TokenType.EOF):
             try:
                 statement = self.parse_statement()
-            except UnexpectedTokenType:
-                pass
-            except NoPrefixParseFuncError:
+            except (UnexpectedTokenType, NoPrefixParseFuncError):
                 pass
             else:
                 program.statements.append(statement)
@@ -193,6 +192,12 @@ class Parser:
         return ast.InfixExpression(
             token=tok, operator=tok.literal, left=left, right=right
         )
+
+    def parse_grouped_expression(self) -> ast.Expression:
+        self.next_token()
+        expression = self.parse_expression(Precedence.LOWEST)
+        self.expect_peek_and_next(token.TokenType.RPAREN)
+        return expression
 
     def current_precedence(self) -> Precedence:
         return Precedence.get(self.current_token.type_, Precedence.LOWEST)

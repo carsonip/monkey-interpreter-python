@@ -369,6 +369,11 @@ def test_parsing_infix_expressions(input, expression):
         ("false", "false"),
         ("3 > 5 == false", "((3 > 5) == false)"),
         ("3 < 5 == true", "((3 < 5) == true)"),
+        ("1 + (2 + 3) + 4", "((1 + (2 + 3)) + 4)"),
+        ("(5 + 5) * 2", "((5 + 5) * 2)"),
+        ("2 / (5 + 5)", "(2 / (5 + 5))"),
+        ("-(5 + 5)", "(-(5 + 5))"),
+        ("!(true == true)", "(!(true == true))"),
     ],
 )
 def test_operator_precedence_parsing(input, expected):
