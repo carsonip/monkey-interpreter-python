@@ -4,12 +4,12 @@ from monkey.lexer import Lexer
 from monkey.token import TokenType
 
 
-def prompt():
+def prompt() -> None:
     print(">> ", end="")
     sys.stdout.flush()
 
 
-def repl():
+def repl() -> None:
     prompt()
     for line in sys.stdin:
         lexer = Lexer(line)
