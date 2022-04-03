@@ -39,6 +39,9 @@ jobs:
       - run:
           name: Run type checking
           command: poetry run mypy
+      - run:
+          name: Run code formatting
+          command: poetry run black --check .
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
