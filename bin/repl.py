@@ -1,21 +1,13 @@
-import sys
-
 from monkey.lexer import Lexer
 from monkey.token import TokenType
 
 
-def prompt() -> None:
-    print(">> ", end="")
-    sys.stdout.flush()
-
-
 def repl() -> None:
-    prompt()
-    for line in sys.stdin:
+    while True:
+        line = input(">> ")
         lexer = Lexer(line)
         while (tok := lexer.next_token()).type_ != TokenType.EOF:
             print(tok)
-        prompt()
 
 
 if __name__ == "__main__":
