@@ -10,6 +10,8 @@ from monkey.ast import (
     PrefixExpression,
     InfixExpression,
     Boolean,
+    IfExpression,
+    BlockStatement,
 )
 from monkey.lexer import Lexer
 from monkey.parser import Parser
@@ -384,3 +386,88 @@ def test_operator_precedence_parsing(input, expected):
     assert not parser.errors
     assert len(program.statements) == 1
     assert program.statements[0].string() == expected
+
+
+@pytest.mark.parametrize(
+    "input,expected",
+    [
+        (
+            "if (x < y) { x }",
+            IfExpression(
+                token=Token(type_=TokenType.IF, literal="if"),
+                condition=InfixExpression(
+                    token=Token(type_=TokenType.LT, literal="<"),
+                    left=Identifier(
+                        token=Token(type_=TokenType.IDENT, literal="x"), value="x"
+                    ),
+                    operator="<",
+                    right=Identifier(
+                        token=Token(type_=TokenType.IDENT, literal="y"), value="y"
+                    ),
+                ),
+                consequence=BlockStatement(
+                    token=Token(type_=TokenType.LBRACE, literal="{"),
+                    statements=[
+                        ExpressionStatement(
+                            token=Token(type_=TokenType.IDENT, literal="x"),
+                            expression=Identifier(
+                                token=Token(type_=TokenType.IDENT, literal="x"),
+                                value="x",
+                            ),
+                        )
+                    ],
+                ),
+                alternative=None,
+            ),
+        ),
+        (
+            "if (x < y) { x } else { y }",
+            IfExpression(
+                token=Token(type_=TokenType.IF, literal="if"),
+                condition=InfixExpression(
+                    token=Token(type_=TokenType.LT, literal="<"),
+                    left=Identifier(
+                        token=Token(type_=TokenType.IDENT, literal="x"), value="x"
+                    ),
+                    operator="<",
+                    right=Identifier(
+                        token=Token(type_=TokenType.IDENT, literal="y"), value="y"
+                    ),
+                ),
+                consequence=BlockStatement(
+                    token=Token(type_=TokenType.LBRACE, literal="{"),
+                    statements=[
+                        ExpressionStatement(
+                            token=Token(type_=TokenType.IDENT, literal="x"),
+                            expression=Identifier(
+                                token=Token(type_=TokenType.IDENT, literal="x"),
+                                value="x",
+                            ),
+                        )
+                    ],
+                ),
+                alternative=BlockStatement(
+                    token=Token(type_=TokenType.LBRACE, literal="{"),
+                    statements=[
+                        ExpressionStatement(
+                            token=Token(type_=TokenType.IDENT, literal="y"),
+                            expression=Identifier(
+                                token=Token(type_=TokenType.IDENT, literal="y"),
+                                value="y",
+                            ),
+                        )
+                    ],
+                ),
+            ),
+        ),
+    ],
+)
+def test_if_expression(input, expected):
+    lexer = Lexer(input)
+    parser = Parser(lexer)
+
+    program = parser.parse_program()
+    assert not parser.errors
+    statement = program.statements[0]
+    assert isinstance(statement, ExpressionStatement)
+    assert statement.expression == expected

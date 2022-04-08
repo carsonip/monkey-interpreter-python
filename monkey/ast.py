@@ -136,3 +136,32 @@ class Boolean(Expression):
 
     def string(self) -> str:
         return str(self.value).lower()
+
+
+@dataclasses.dataclass
+class BlockStatement(Statement):
+    token: token.Token
+    statements: list[Statement]
+
+    def token_literal(self) -> str:
+        return self.token.literal
+
+    def string(self) -> str:
+        return "\n".join(statement.string() for statement in self.statements)
+
+
+@dataclasses.dataclass
+class IfExpression(Expression):
+    token: token.Token
+    condition: Expression
+    consequence: BlockStatement
+    alternative: BlockStatement | None
+
+    def token_literal(self) -> str:
+        return self.token.literal
+
+    def string(self) -> str:
+        s = f"if {self.condition.string()} {self.consequence.string()}"
+        if self.alternative:
+            s += f"else {self.alternative.string()}"
+        return s

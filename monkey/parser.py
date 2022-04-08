@@ -56,6 +56,7 @@ class Parser:
             token.TokenType.TRUE: self.parse_boolean,
             token.TokenType.FALSE: self.parse_boolean,
             token.TokenType.LPAREN: self.parse_grouped_expression,
+            token.TokenType.IF: self.parse_if_expression,
         }
         return parse_funcs.get(token_type)
 
@@ -198,6 +199,39 @@ class Parser:
         expression = self.parse_expression(Precedence.LOWEST)
         self.expect_peek_and_next(token.TokenType.RPAREN)
         return expression
+
+    def parse_if_expression(self) -> ast.IfExpression:
+        tok = self.current_token
+        self.expect_peek_and_next(token.TokenType.LPAREN)
+        self.next_token()
+        condition = self.parse_expression(Precedence.LOWEST)
+        self.expect_peek_and_next(token.TokenType.RPAREN)
+        self.expect_peek_and_next(token.TokenType.LBRACE)
+        consequence = self.parse_block_statement()
+        self.expect_peek_and_next(token.TokenType.RBRACE)
+        alternative: ast.BlockStatement | None = None
+        if self.peek_token.is_type(token.TokenType.ELSE):
+            self.next_token()
+            self.expect_peek_and_next(token.TokenType.LBRACE)
+            alternative = self.parse_block_statement()
+            self.expect_peek_and_next(token.TokenType.RBRACE)
+
+        return ast.IfExpression(
+            token=tok,
+            condition=condition,
+            consequence=consequence,
+            alternative=alternative,
+        )
+
+    def parse_block_statement(self) -> ast.BlockStatement:
+        tok = self.current_token
+        statements: list[ast.Statement] = []
+        while not self.peek_token.is_type(
+            token.TokenType.RBRACE
+        ) and not self.peek_token.is_type(token.TokenType.EOF):
+            self.next_token()
+            statements.append(self.parse_statement())
+        return ast.BlockStatement(token=tok, statements=statements)
 
     def current_precedence(self) -> Precedence:
         return Precedence.get(self.current_token.type_, Precedence.LOWEST)
