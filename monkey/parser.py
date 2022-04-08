@@ -226,9 +226,7 @@ class Parser:
     def parse_block_statement(self) -> ast.BlockStatement:
         tok = self.current_token
         statements: list[ast.Statement] = []
-        while not self.peek_token.is_type(
-            token.TokenType.RBRACE
-        ) and not self.peek_token.is_type(token.TokenType.EOF):
+        while not self.peek_token.is_type(token.TokenType.RBRACE, token.TokenType.EOF):
             self.next_token()
             statements.append(self.parse_statement())
         return ast.BlockStatement(token=tok, statements=statements)

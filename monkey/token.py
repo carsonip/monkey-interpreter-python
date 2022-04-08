@@ -57,5 +57,5 @@ class Token:
     type_: TokenType
     literal: str
 
-    def is_type(self, token_type: TokenType) -> bool:
-        return self.type_ == token_type
+    def is_type(self, *token_type: TokenType) -> bool:
+        return self.type_ in token_type
