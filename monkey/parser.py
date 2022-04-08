@@ -87,6 +87,12 @@ class Parser:
             raise UnexpectedTokenType
         self.next_token()
 
+    def current_precedence(self) -> Precedence:
+        return Precedence.get(self.current_token.type_, Precedence.LOWEST)
+
+    def peek_precedence(self) -> Precedence:
+        return Precedence.get(self.peek_token.type_, Precedence.LOWEST)
+
     def parse_program(self) -> ast.Program:
         program = ast.Program()
 
@@ -202,13 +208,16 @@ class Parser:
 
     def parse_if_expression(self) -> ast.IfExpression:
         tok = self.current_token
+
         self.expect_peek_and_next(token.TokenType.LPAREN)
         self.next_token()
         condition = self.parse_expression(Precedence.LOWEST)
         self.expect_peek_and_next(token.TokenType.RPAREN)
+
         self.expect_peek_and_next(token.TokenType.LBRACE)
         consequence = self.parse_block_statement()
         self.expect_peek_and_next(token.TokenType.RBRACE)
+
         alternative: ast.BlockStatement | None = None
         if self.peek_token.is_type(token.TokenType.ELSE):
             self.next_token()
@@ -230,9 +239,3 @@ class Parser:
             self.next_token()
             statements.append(self.parse_statement())
         return ast.BlockStatement(token=tok, statements=statements)
-
-    def current_precedence(self) -> Precedence:
-        return Precedence.get(self.current_token.type_, Precedence.LOWEST)
-
-    def peek_precedence(self) -> Precedence:
-        return Precedence.get(self.peek_token.type_, Precedence.LOWEST)
